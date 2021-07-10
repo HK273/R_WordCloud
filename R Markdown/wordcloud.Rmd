@@ -1,0 +1,154 @@
+---
+title: "Word Cloud: Appointment Activities"
+author: "Hector Kurtyanek"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning  = FALSE, message = FALSE)
+```
+
+## Code Summary
+
+This code produces a simple word cloud visualisation of appointment activities
+
+## Remove objects if necessary
+
+```{r}
+rm(list = ls())
+```
+
+### Install Packages
+
+You will need to install the below packages to create the output
+
+```{r}
+#install.packages("tm")
+```
+
+### Make packages available
+
+```{r}
+library(tm)
+```
+
+### Give some more information on the pacakge
+
+```{r}
+#??tm
+```
+
+
+### Read text file into R
+```{r}
+TagLog_txt <- VCorpus(DirSource("H:/R/Text")) #Make sure you just read the folder path in (must only contain one text file)
+```
+
+## Text Manipulation
+
+#### Convert to lower case
+```{r}
+TagLog_txt2 <- tm_map(TagLog_txt, content_transformer(tolower))
+```
+
+#### Remove punctuations
+```{r}
+TagLog_txt3 <- tm_map(TagLog_txt2, removePunctuation)
+```
+
+#### Remove stopwords
+```{r}
+TagLog_txt4 <- tm_map(TagLog_txt3, removeWords, stopwords())
+```
+
+
+#### Generate TF-IDF matrix
+```{r}
+TagLog_dtm <- DocumentTermMatrix(TagLog_txt4)
+```
+
+#### Inspect to TF-IDF
+```{r}
+inspect(TagLog_dtm)
+```
+
+#### Generate a frequency data frame
+```{r}
+word_frequency <- sort(colSums(as.matrix(TagLog_dtm)),
+                       decreasing=TRUE)
+df_frequency<- data.frame(word = names(word_frequency),
+                          freq=word_frequency)
+
+head(df_frequency)
+```
+
+
+# Displaying the Word Cloud
+
+
+### Install Packages
+```{r}
+#install.packages("wordcloud")
+```
+
+### Make packages available
+```{r}
+library(wordcloud)
+```
+
+## Simple Word Cloud
+```{r}
+wordcloud(df_frequency$word,
+          df_frequency$freq)
+```
+
+
+
+## Top 10 words
+```{r}
+wordcloud(df_frequency$word,
+          df_frequency$freq,
+          max.words=10, min.freq = 1)
+```
+
+
+# Enhancing the Word Cloud
+
+
+### Choose a specific font and order
+```{r}
+wordcloud(df_frequency$word,
+          df_frequency$freq,
+          max.words=10, min.freq = 1,
+          random.order=FALSE,
+          family = "Helvatica", font = 3)
+```
+
+
+### Using a color palatte
+```{r}
+library(RColorBrewer)
+
+word_pal <- brewer.pal(10,"Dark2")
+
+wordcloud(df_frequency$word,
+          df_frequency$freq,
+          max.words=20, min.freq = 1,
+          random.order=FALSE,
+          colors=word_pal, font = 3)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
